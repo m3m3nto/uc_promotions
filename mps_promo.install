@@ -1,0 +1,67 @@
+<?php
+/**
+ * Implementation of hook_install
+ */
+function mps_promo_install(){
+  drupal_install_schema('mps_promo');
+}
+
+/**
+ * Implementation of hook_uninstall
+ */
+function mps_promo_uninstall(){
+  drupal_uninstall_schema('mps_promo');
+}
+
+/** 
+ * Implementation of hook_schema
+ */
+function mps_promo_schema(){
+	//Promotions table
+  $schema['mps_promotions'] = array(
+		'description' => 'MPS Promotions.',
+    'fields' => array(
+      'promoid' => array(
+        'description' => 'The promotion id.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+			'nid' => array(
+        'description' => 'The {node}.nid of the promo product.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+			'price_limit' => array(
+        'description' => 'The minimum cart total to fire the promotion.',
+        'type' => 'numeric',
+        'precision' => 16,
+        'scale' => 5,
+        'not null' => TRUE,
+        'default' => 0.0,
+      ),
+			'domain' => array(
+        'description' => 'The specific subdomain to apply the promotion.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+			'status' => array(
+        'description' => 'Status: 1 -> published.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+		),
+		'indexes' => array(
+      'promoid' => array('promoid'),
+    ),
+    'primary key' => array('promoid'),
+	);
+	
+	return $schema;
+}

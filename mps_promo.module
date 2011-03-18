@@ -1,0 +1,138 @@
+<?php
+/**
+ * MPS Utils module
+ */
+
+/**
+ * Implements hook_perm
+* Valid permissions for this module
+*/
+function mps_promo_perm() {
+  return array('access mps promotions');
+}
+
+/**
+ * Implements hook_menu
+ *
+ */
+function mps_promo_menu(){
+	$items['admin/store/mps_promotions'] = array(
+		'title' => t('Promozioni'),
+		'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
+		'access arguments' => array('access mps promotions'),
+		'page callback' => 'mps_promo_get_promos',
+		'type' => MENU_NORMAL_ITEM,
+		'file' => 'mps_promo.inc',
+	);
+	
+	$items['admin/store/mps_promotions/view'] = array(
+		'title' => t('Visualizza promozioni'),
+		'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
+		'access arguments' => array('access mps promotions'),
+		'page callback' => 'mps_promo_get_promos',
+		'type' => MENU_NORMAL_ITEM,
+		'file' => 'mps_promo.inc',
+	);
+	
+	$items['admin/store/mps_promotions/create'] = array(
+		'title' => t('Crea promozione'),
+		'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
+		'access arguments' => array('access mps promotions'),
+		'page callback' => 'mps_promo_create_promo',
+		'type' => MENU_NORMAL_ITEM,
+		'file' => 'mps_promo.inc',
+	);
+	
+	$items['admin/store/mps_promotions/%mps_promo_id/edit'] = array(
+		'title' => t('Modifica promozione'),
+		'description' => t('Questa area permette di modificare una promozione'),
+		'access arguments' => array('access mps promotions'),
+		'page callback' => 'mps_promo_edit_promo',
+		'page arguments' => array(3),
+		'type' => MENU_NORMAL_ITEM,
+		'file' => 'mps_promo.inc',
+	);
+	
+	return $items;
+}
+
+/*
+ * Load a promo, called from wildcard menu item
+ */
+function mps_promo_id_load($promo_id){
+	$sql = "SELECT * FROM {mps_promotions} WHERE promoid = %d";
+	$result = db_query($sql, $promo_id);
+	
+	$results = array();
+	while($data = db_fetch_object($result)){
+		$results['promoid'] = $data->promoid;
+		$results['nid'] = $data->nid;
+		$results['price_limit'] = $data->price_limit;
+		$results['domain'] = $data->domain;
+		$results['status'] = $data->status;
+	}
+
+	return $results;
+}
+
+/**
+ * Implements hook_add_to_cart
+ * Inject a promotion inside the cart when a specific condition is satisfied
+ */
+
+function mps_promo_uc_cart_alter(&$items) {
+	//loading active promos
+	$sql = "SELECT * FROM {mps_promotions} WHERE status=%d";
+	$result = db_query($sql, 1);
+	$retuls = array();
+	while($data = db_fetch_object($result)){
+		//applying the promotion
+		mps_promo_handler($data->nid, $data->price_limit, $data->domain, $items); 
+	}
+
+}
+
+/**
+ * Promotion handler
+ */
+function mps_promo_handler($nid, $price_limit, $domain, &$items){
+	if($_SERVER['HTTP_HOST'] != $domain){
+		return;
+	}
+	
+	// FotoRomanzo Offer
+	$promo_free_id = $nid;
+	$promo_data = array("module" => "uc_product");
+	
+	//Check the current cart total and determine the total price
+	$price = 0;
+	foreach($items as $item){
+		$price += ($item->qty * $item->price);
+	}
+	
+	//Check for promo products inside list
+	$item_check = 0;
+	foreach($items as $item){
+		
+		if($item->nid == $promo_free_id) { 
+			//Populate $item_check
+			$item_check = 1;
+			
+			//Force the promotion qty to 1
+			if($item->qty > 1){
+				$item->qty = 1;
+			}
+		}
+		
+	}
+
+	//Add the promotion
+	if($price >= $price_limit && $item_check == 0){
+		uc_cart_add_item($promo_free_id, $qty = 1, $data = NULL, $cid = NULL, $msg = "", $check_redirect = TRUE, $rebuild = TRUE);
+	}
+	
+	//Remove the promotion
+	if($price < $price_limit){
+		uc_cart_remove_item($promo_free_id, null, $promo_data);
+	}
+}
