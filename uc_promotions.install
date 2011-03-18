@@ -2,24 +2,24 @@
 /**
  * Implementation of hook_install
  */
-function mps_promo_install(){
-  drupal_install_schema('mps_promo');
+function uc_promotions_install(){
+  drupal_install_schema('uc_promotions');
 }
 
 /**
  * Implementation of hook_uninstall
  */
-function mps_promo_uninstall(){
-  drupal_uninstall_schema('mps_promo');
+function uc_promotions_uninstall(){
+  drupal_uninstall_schema('uc_promotions');
 }
 
 /** 
  * Implementation of hook_schema
  */
-function mps_promo_schema(){
+function uc_promotions_schema(){
 	//Promotions table
-  $schema['mps_promotions'] = array(
-		'description' => 'MPS Promotions.',
+  $schema['uc_promotions'] = array(
+		'description' => 'Ubercart Promotions.',
     'fields' => array(
       'promoid' => array(
         'description' => 'The promotion id.',

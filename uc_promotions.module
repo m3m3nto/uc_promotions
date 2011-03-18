@@ -7,50 +7,50 @@
  * Implements hook_perm
 * Valid permissions for this module
 */
-function mps_promo_perm() {
-  return array('access mps promotions');
+function uc_promotions_perm() {
+  return array('access ubercart promotions');
 }
 
 /**
  * Implements hook_menu
  *
  */
-function mps_promo_menu(){
-	$items['admin/store/mps_promotions'] = array(
+function uc_promotions_menu(){
+	$items['admin/store/uc_promotions'] = array(
 		'title' => t('Promozioni'),
 		'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
-		'access arguments' => array('access mps promotions'),
-		'page callback' => 'mps_promo_get_promos',
+		'access arguments' => array('access ubercart promotions'),
+		'page callback' => 'uc_promotions_get_promos',
 		'type' => MENU_NORMAL_ITEM,
-		'file' => 'mps_promo.inc',
+		'file' => 'uc_promotions.inc',
 	);
 	
-	$items['admin/store/mps_promotions/view'] = array(
+	$items['admin/store/uc_promotions/view'] = array(
 		'title' => t('Visualizza promozioni'),
 		'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
-		'access arguments' => array('access mps promotions'),
-		'page callback' => 'mps_promo_get_promos',
+		'access arguments' => array('access ubercart promotions'),
+		'page callback' => 'uc_promotions_get_promos',
 		'type' => MENU_NORMAL_ITEM,
-		'file' => 'mps_promo.inc',
+		'file' => 'uc_promotions.inc',
 	);
 	
-	$items['admin/store/mps_promotions/create'] = array(
+	$items['admin/store/uc_promotions/create'] = array(
 		'title' => t('Crea promozione'),
 		'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
-		'access arguments' => array('access mps promotions'),
-		'page callback' => 'mps_promo_create_promo',
+		'access arguments' => array('access ubercart promotions'),
+		'page callback' => 'uc_promotions_create_promo',
 		'type' => MENU_NORMAL_ITEM,
-		'file' => 'mps_promo.inc',
+		'file' => 'uc_promotions.inc',
 	);
 	
-	$items['admin/store/mps_promotions/%mps_promo_id/edit'] = array(
+	$items['admin/store/uc_promotions/%uc_promotions_id/edit'] = array(
 		'title' => t('Modifica promozione'),
 		'description' => t('Questa area permette di modificare una promozione'),
-		'access arguments' => array('access mps promotions'),
-		'page callback' => 'mps_promo_edit_promo',
+		'access arguments' => array('access ubercart promotions'),
+		'page callback' => 'uc_promotions_edit_promo',
 		'page arguments' => array(3),
 		'type' => MENU_NORMAL_ITEM,
-		'file' => 'mps_promo.inc',
+		'file' => 'uc_promotions.inc',
 	);
 	
 	return $items;
@@ -59,8 +59,8 @@ function mps_promo_menu(){
 /*
  * Load a promo, called from wildcard menu item
  */
-function mps_promo_id_load($promo_id){
-	$sql = "SELECT * FROM {mps_promotions} WHERE promoid = %d";
+function uc_promotions_id_load($promo_id){
+	$sql = "SELECT * FROM {uc_promotionstions} WHERE promoid = %d";
 	$result = db_query($sql, $promo_id);
 	
 	$results = array();
@@ -80,14 +80,14 @@ function mps_promo_id_load($promo_id){
  * Inject a promotion inside the cart when a specific condition is satisfied
  */
 
-function mps_promo_uc_cart_alter(&$items) {
+function uc_promotions_uc_cart_alter(&$items) {
 	//loading active promos
-	$sql = "SELECT * FROM {mps_promotions} WHERE status=%d";
+	$sql = "SELECT * FROM {uc_promotionstions} WHERE status=%d";
 	$result = db_query($sql, 1);
 	$retuls = array();
 	while($data = db_fetch_object($result)){
 		//applying the promotion
-		mps_promo_handler($data->nid, $data->price_limit, $data->domain, $items); 
+		uc_promotions_handler($data->nid, $data->price_limit, $data->domain, $items); 
 	}
 
 }
@@ -95,7 +95,7 @@ function mps_promo_uc_cart_alter(&$items) {
 /**
  * Promotion handler
  */
-function mps_promo_handler($nid, $price_limit, $domain, &$items){
+function uc_promotions_handler($nid, $price_limit, $domain, &$items){
 	if($_SERVER['HTTP_HOST'] != $domain){
 		return;
 	}
