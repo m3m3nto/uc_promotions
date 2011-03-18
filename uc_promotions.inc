@@ -56,7 +56,7 @@ function uc_promotions_form(&$form_state, $data = NULL){
   
   $form['domain'] = array(
     '#title' => t('Domain'),
-    '#description' => t('If you have multisite'),
+    '#description' => t('If you have multisite installation you can limit this promotion to fires only for that subdomain'),
     '#type' => 'textfield',
     '#required' => false,
     '#size' => 30,
@@ -65,9 +65,9 @@ function uc_promotions_form(&$form_state, $data = NULL){
   
   $form['status'] = array(
     '#title' => t('Attivo'),
-    '#description' => t('Indica se la promozione è attiva oppure no'),
+    '#description' => t('The promotion is active'),
     '#type' => 'select',
-    '#options' => array('' => '', '1' => 'si', '0' => 'no'),
+    '#options' => array('' => '', '1' => 'yes', '0' => 'no'),
     '#required' => true,
     '#default_value' => $data['status'],
   );
@@ -80,8 +80,8 @@ function uc_promotions_form(&$form_state, $data = NULL){
   
   if($data['promoid']){
     $form['del'] = array(
-      '#title' => t('Cancella'),
-      '#description' => t('Permette di cancellare la promozione'),
+      '#title' => t('Deleted'),
+      '#description' => t('Delete the promotion'),
       '#type' => 'select',
       '#options' => array('0'=>'no', '1'=>'si'),
       '#required' => false,
@@ -101,7 +101,7 @@ function uc_promotions_form(&$form_state, $data = NULL){
  */
 function uc_promotions_form_validate($form, &$form_state){
   if(!is_numeric($form_state['values']['price_limit'])){
-    form_set_error('', t("Attenzione il campo Limite prezzo accetta solo valori numerici"));
+    form_set_error('', t("Price limit require only numerical values"));
   }
 }
 
@@ -116,7 +116,7 @@ function uc_promotions_form_submit($form, &$form_state){
     $sql = "DELETE FROM {uc_promotionstions} WHERE promoid = %d";
     if(db_query($sql, $v['promoid'])){
       $form_state['redirect'] = 'admin/store/uc_promotionstions';
-      drupal_set_message(t('Promozione eliminata con successo'), $type = 'status');
+      drupal_set_message(t('Promotion deleted'), $type = 'status');
     }
   }else{
     //Create or update a promotion
@@ -124,9 +124,9 @@ function uc_promotions_form_submit($form, &$form_state){
 
     if(drupal_write_record('uc_promotionstions', $form_state['values'], $update)) {
       $form_state['redirect'] = 'admin/store/uc_promotionstions';
-      drupal_set_message(t('Promozione creata/aggiornata con successo'), $type = 'status');
+      drupal_set_message(t('Promotion created/modified'), $type = 'status');
     }else{
-      drupal_set_message(t('Errore durante l\'inserimento/modifica dei dati'), $type = 'error');
+      drupal_set_message(t('An error has occured while processing the request'), $type = 'error');
     }
   }
 }
@@ -141,11 +141,11 @@ function _get_promos(){
   
   $headers = array();
   $headers[]= t('Promo-id');
-  $headers[]= t('Prodotto in promozione');
-  $headers[]= t('Limite prezzo');
-  $headers[]= t('Dominio');
+  $headers[]= t('Product');
+  $headers[]= t('Price limit');
+  $headers[]= t('Domain');
   $headers[]= t('Status');
-  $headers[]= t('Azioni');
+  $headers[]= t('Actions');
   
   $rows = array();
   while($data = db_fetch_object($result)){

@@ -17,8 +17,8 @@ function uc_promotions_perm() {
  */
 function uc_promotions_menu(){
   $items['admin/store/uc_promotions'] = array(
-    'title' => t('Promozioni'),
-    'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
+    'title' => t('Promotions'),
+    'description' => t('Active promotions'),
     'access arguments' => array('access ubercart promotions'),
     'page callback' => 'uc_promotions_get_promos',
     'type' => MENU_NORMAL_ITEM,
@@ -26,8 +26,8 @@ function uc_promotions_menu(){
   );
   
   $items['admin/store/uc_promotions/view'] = array(
-    'title' => t('Visualizza promozioni'),
-    'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
+    'title' => t('View promotions'),
+    'description' => t('Active promotions'),
     'access arguments' => array('access ubercart promotions'),
     'page callback' => 'uc_promotions_get_promos',
     'type' => MENU_NORMAL_ITEM,
@@ -35,8 +35,8 @@ function uc_promotions_menu(){
   );
   
   $items['admin/store/uc_promotions/create'] = array(
-    'title' => t('Crea promozione'),
-    'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
+    'title' => t('Create a promotion'),
+    'description' => t('In this area you can add a promotion'),
     'access arguments' => array('access ubercart promotions'),
     'page callback' => 'uc_promotions_create_promo',
     'type' => MENU_NORMAL_ITEM,
@@ -45,7 +45,7 @@ function uc_promotions_menu(){
   
   $items['admin/store/uc_promotions/%uc_promotions_id/edit'] = array(
     'title' => t('Modifica promozione'),
-    'description' => t('Questa area permette di modificare una promozione'),
+    'description' => t('In this area you can edit a promotion'),
     'access arguments' => array('access ubercart promotions'),
     'page callback' => 'uc_promotions_edit_promo',
     'page arguments' => array(3),
@@ -101,7 +101,7 @@ function uc_promotions_handler($nid, $price_limit, $domain, &$items){
     return;
   }
   
-  // FotoRomanzo Offer
+  // Offer
   $promo_free_id = $nid;
   $promo_data = array("module" => "uc_product");
   
