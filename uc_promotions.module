@@ -1,12 +1,12 @@
 <?php
 /**
- * MPS Utils module
+ * @file Ubercart Promotions main module
  */
 
 /**
  * Implements hook_perm
-* Valid permissions for this module
-*/
+ * Valid permissions for this module
+ */
 function uc_promotions_perm() {
   return array('access ubercart promotions');
 }
@@ -16,63 +16,63 @@ function uc_promotions_perm() {
  *
  */
 function uc_promotions_menu(){
-	$items['admin/store/uc_promotions'] = array(
-		'title' => t('Promozioni'),
-		'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
-		'access arguments' => array('access ubercart promotions'),
-		'page callback' => 'uc_promotions_get_promos',
-		'type' => MENU_NORMAL_ITEM,
-		'file' => 'uc_promotions.inc',
-	);
-	
-	$items['admin/store/uc_promotions/view'] = array(
-		'title' => t('Visualizza promozioni'),
-		'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
-		'access arguments' => array('access ubercart promotions'),
-		'page callback' => 'uc_promotions_get_promos',
-		'type' => MENU_NORMAL_ITEM,
-		'file' => 'uc_promotions.inc',
-	);
-	
-	$items['admin/store/uc_promotions/create'] = array(
-		'title' => t('Crea promozione'),
-		'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
-		'access arguments' => array('access ubercart promotions'),
-		'page callback' => 'uc_promotions_create_promo',
-		'type' => MENU_NORMAL_ITEM,
-		'file' => 'uc_promotions.inc',
-	);
-	
-	$items['admin/store/uc_promotions/%uc_promotions_id/edit'] = array(
-		'title' => t('Modifica promozione'),
-		'description' => t('Questa area permette di modificare una promozione'),
-		'access arguments' => array('access ubercart promotions'),
-		'page callback' => 'uc_promotions_edit_promo',
-		'page arguments' => array(3),
-		'type' => MENU_NORMAL_ITEM,
-		'file' => 'uc_promotions.inc',
-	);
-	
-	return $items;
+  $items['admin/store/uc_promotions'] = array(
+    'title' => t('Promozioni'),
+    'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
+    'access arguments' => array('access ubercart promotions'),
+    'page callback' => 'uc_promotions_get_promos',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'uc_promotions.inc',
+  );
+  
+  $items['admin/store/uc_promotions/view'] = array(
+    'title' => t('Visualizza promozioni'),
+    'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
+    'access arguments' => array('access ubercart promotions'),
+    'page callback' => 'uc_promotions_get_promos',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'uc_promotions.inc',
+  );
+  
+  $items['admin/store/uc_promotions/create'] = array(
+    'title' => t('Crea promozione'),
+    'description' => t('Questa area permette di gestire le promozioni nello shop MPS'),
+    'access arguments' => array('access ubercart promotions'),
+    'page callback' => 'uc_promotions_create_promo',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'uc_promotions.inc',
+  );
+  
+  $items['admin/store/uc_promotions/%uc_promotions_id/edit'] = array(
+    'title' => t('Modifica promozione'),
+    'description' => t('Questa area permette di modificare una promozione'),
+    'access arguments' => array('access ubercart promotions'),
+    'page callback' => 'uc_promotions_edit_promo',
+    'page arguments' => array(3),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'uc_promotions.inc',
+  );
+  
+  return $items;
 }
 
 /*
  * Load a promo, called from wildcard menu item
  */
 function uc_promotions_id_load($promo_id){
-	$sql = "SELECT * FROM {uc_promotionstions} WHERE promoid = %d";
-	$result = db_query($sql, $promo_id);
-	
-	$results = array();
-	while($data = db_fetch_object($result)){
-		$results['promoid'] = $data->promoid;
-		$results['nid'] = $data->nid;
-		$results['price_limit'] = $data->price_limit;
-		$results['domain'] = $data->domain;
-		$results['status'] = $data->status;
-	}
+  $sql = "SELECT * FROM {uc_promotionstions} WHERE promoid = %d";
+  $result = db_query($sql, $promo_id);
+  
+  $results = array();
+  while($data = db_fetch_object($result)){
+    $results['promoid'] = $data->promoid;
+    $results['nid'] = $data->nid;
+    $results['price_limit'] = $data->price_limit;
+    $results['domain'] = $data->domain;
+    $results['status'] = $data->status;
+  }
 
-	return $results;
+  return $results;
 }
 
 /**
@@ -81,14 +81,14 @@ function uc_promotions_id_load($promo_id){
  */
 
 function uc_promotions_uc_cart_alter(&$items) {
-	//loading active promos
-	$sql = "SELECT * FROM {uc_promotionstions} WHERE status=%d";
-	$result = db_query($sql, 1);
-	$retuls = array();
-	while($data = db_fetch_object($result)){
-		//applying the promotion
-		uc_promotions_handler($data->nid, $data->price_limit, $data->domain, $items); 
-	}
+  //loading active promos
+  $sql = "SELECT * FROM {uc_promotionstions} WHERE status=%d";
+  $result = db_query($sql, 1);
+  $retuls = array();
+  while($data = db_fetch_object($result)){
+    //applying the promotion
+    uc_promotions_handler($data->nid, $data->price_limit, $data->domain, $items); 
+  }
 
 }
 
@@ -96,43 +96,44 @@ function uc_promotions_uc_cart_alter(&$items) {
  * Promotion handler
  */
 function uc_promotions_handler($nid, $price_limit, $domain, &$items){
-	if($_SERVER['HTTP_HOST'] != $domain){
-		return;
-	}
-	
-	// FotoRomanzo Offer
-	$promo_free_id = $nid;
-	$promo_data = array("module" => "uc_product");
-	
-	//Check the current cart total and determine the total price
-	$price = 0;
-	foreach($items as $item){
-		$price += ($item->qty * $item->price);
-	}
-	
-	//Check for promo products inside list
-	$item_check = 0;
-	foreach($items as $item){
-		
-		if($item->nid == $promo_free_id) { 
-			//Populate $item_check
-			$item_check = 1;
-			
-			//Force the promotion qty to 1
-			if($item->qty > 1){
-				$item->qty = 1;
-			}
-		}
-		
-	}
+  $domain = isset($domain) ? $domain : $_SERVER['HTTP_HOST'];
+  if($_SERVER['HTTP_HOST'] != $domain){
+    return;
+  }
+  
+  // FotoRomanzo Offer
+  $promo_free_id = $nid;
+  $promo_data = array("module" => "uc_product");
+  
+  //Check the current cart total and determine the total price
+  $price = 0;
+  foreach($items as $item){
+    $price += ($item->qty * $item->price);
+  }
+  
+  //Check for promo products inside list
+  $item_check = 0;
+  foreach($items as $item){
+    
+    if($item->nid == $promo_free_id) { 
+      //Populate $item_check
+      $item_check = 1;
+      
+      //Force the promotion qty to 1
+      if($item->qty > 1){
+        $item->qty = 1;
+      }
+    }
+    
+  }
 
-	//Add the promotion
-	if($price >= $price_limit && $item_check == 0){
-		uc_cart_add_item($promo_free_id, $qty = 1, $data = NULL, $cid = NULL, $msg = "", $check_redirect = TRUE, $rebuild = TRUE);
-	}
-	
-	//Remove the promotion
-	if($price < $price_limit){
-		uc_cart_remove_item($promo_free_id, null, $promo_data);
-	}
+  //Add the promotion
+  if($price >= $price_limit && $item_check == 0){
+    uc_cart_add_item($promo_free_id, $qty = 1, $data = NULL, $cid = NULL, $msg = "", $check_redirect = TRUE, $rebuild = TRUE);
+  }
+  
+  //Remove the promotion
+  if($price < $price_limit){
+    uc_cart_remove_item($promo_free_id, null, $promo_data);
+  }
 }

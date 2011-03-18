@@ -17,9 +17,9 @@ function uc_promotions_uninstall(){
  * Implementation of hook_schema
  */
 function uc_promotions_schema(){
-	//Promotions table
+  //Promotions table
   $schema['uc_promotions'] = array(
-		'description' => 'Ubercart Promotions.',
+    'description' => 'Ubercart Promotions.',
     'fields' => array(
       'promoid' => array(
         'description' => 'The promotion id.',
@@ -27,14 +27,14 @@ function uc_promotions_schema(){
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-			'nid' => array(
+      'nid' => array(
         'description' => 'The {node}.nid of the promo product.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
       ),
-			'price_limit' => array(
+      'price_limit' => array(
         'description' => 'The minimum cart total to fire the promotion.',
         'type' => 'numeric',
         'precision' => 16,
@@ -42,26 +42,26 @@ function uc_promotions_schema(){
         'not null' => TRUE,
         'default' => 0.0,
       ),
-			'domain' => array(
+      'domain' => array(
         'description' => 'The specific subdomain to apply the promotion.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
       ),
-			'status' => array(
+      'status' => array(
         'description' => 'Status: 1 -> published.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
       ),
-		),
-		'indexes' => array(
+    ),
+    'indexes' => array(
       'promoid' => array('promoid'),
     ),
     'primary key' => array('promoid'),
-	);
-	
-	return $schema;
+  );
+  
+  return $schema;
 }
