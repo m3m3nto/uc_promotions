@@ -1,0 +1,2 @@
+Uc_promotions is a very basic Drupal/Ubercart module that helps managing simple products promotions in your e-commerce site.
+It's possibile to add a promotion that fires when the amount in the user cart is greater than a specific price.
