@@ -1,18 +1,4 @@
 <?php
-/**
- * Implementation of hook_install
- */
-function uc_promotions_install(){
-  drupal_install_schema('uc_promotions');
-}
-
-/**
- * Implementation of hook_uninstall
- */
-function uc_promotions_uninstall(){
-  drupal_uninstall_schema('uc_promotions');
-}
-
 /** 
  * Implementation of hook_schema
  */
