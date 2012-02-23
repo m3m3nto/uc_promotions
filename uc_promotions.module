@@ -84,7 +84,7 @@ function uc_promotions_uc_cart_alter(&$items) {
   //loading active promos
   $sql = "SELECT * FROM {uc_promotionstions} WHERE status=%d";
   $result = db_query($sql, 1);
-  $retuls = array();
+
   while($data = db_fetch_object($result)){
     //applying the promotion
     uc_promotions_handler($data->nid, $data->price_limit, $data->domain, $items); 
