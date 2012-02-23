@@ -4,11 +4,16 @@
  */
 
 /**
- * Implements hook_perm
+ * Implements hook_permission
  * Valid permissions for this module
  */
-function uc_promotions_perm() {
-  return array('access ubercart promotions');
+function uc_promotions_permission() {
+  return array(
+    'access ubercart promotions' => array(
+      'title' => t('Access Ubercart Promotions'), 
+      'description' => t('Perform administration tasks for Ubercart Promotions.'),
+    ),
+  );
 }
 
 /**
@@ -76,7 +81,7 @@ function uc_promotions_id_load($promo_id){
 }
 
 /**
- * Implements hook_add_to_cart
+ * Implements hook_uc_cart_alter
  * Inject a promotion inside the cart when a specific condition is satisfied
  */
 
@@ -84,7 +89,6 @@ function uc_promotions_uc_cart_alter(&$items) {
   //loading active promos
   $sql = "SELECT * FROM {uc_promotionstions} WHERE status=%d";
   $result = db_query($sql, 1);
-  $retuls = array();
   while($data = db_fetch_object($result)){
     //applying the promotion
     uc_promotions_handler($data->nid, $data->price_limit, $data->domain, $items); 
