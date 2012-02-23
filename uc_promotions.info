@@ -4,6 +4,6 @@ name = uc_promotions
 description = Provides Ubercart promotions functionalities
 package = Ubercart
 core = 6.x
-version = "6.x-0.1"
+version = "6.x-1.x-dev"
 
 dependencies[] = uc_cart
