@@ -1,6 +1,6 @@
 ; $Id$
 
-name = Ubercart Promotions
+name = uc_promotions
 description = Provides Ubercart promotions functionalities
 package = Ubercart
 core = 6.x
