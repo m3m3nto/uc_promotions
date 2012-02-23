@@ -113,17 +113,17 @@ function uc_promotions_form_submit($form, &$form_state){
   
   //Delete a promotion
   if($v['del'] == 1){
-    $sql = "DELETE FROM {uc_promotionstions} WHERE promoid = %d";
+    $sql = "DELETE FROM {uc_promotions} WHERE promoid = %d";
     if(db_query($sql, $v['promoid'])){
-      $form_state['redirect'] = 'admin/store/uc_promotionstions';
+      $form_state['redirect'] = 'admin/store/uc_promotions';
       drupal_set_message(t('Promotion deleted'), $type = 'status');
     }
   }else{
     //Create or update a promotion
     $update = isset($v['promoid']) && $v['promoid'] != '' ? 'promoid' : array();
 
-    if(drupal_write_record('uc_promotionstions', $form_state['values'], $update)) {
-      $form_state['redirect'] = 'admin/store/uc_promotionstions';
+    if(drupal_write_record('uc_promotions', $form_state['values'], $update)) {
+      $form_state['redirect'] = 'admin/store/uc_promotions';
       drupal_set_message(t('Promotion created/modified'), $type = 'status');
     }else{
       drupal_set_message(t('An error has occured while processing the request'), $type = 'error');
@@ -136,11 +136,13 @@ function uc_promotions_form_submit($form, &$form_state){
  * Returns a list of promotions
  */
 function _get_promos(){
-  $sql = "SELECT * FROM {uc_promotionstions}";
-  $result = db_query($sql);
+  $results = db_select('uc_promotions', 'p')
+             ->fields('p', array('promoid', 'nid', 'domain', 'status'))
+             ->execute();
+  var_dump($results);
   
-  $headers = array();
-  $headers[]= t('Promo-id');
+  $table = array();
+  $table['headers']= t('Promo-id');
   $headers[]= t('Product');
   $headers[]= t('Price limit');
   $headers[]= t('Domain');
@@ -148,7 +150,7 @@ function _get_promos(){
   $headers[]= t('Actions');
   
   $rows = array();
-  while($data = db_fetch_object($result)){
+  foreach($results as $data){
     $content = array();
     $product = node_load($data->nid);
     
@@ -161,7 +163,7 @@ function _get_promos(){
     $rows[]=$content;
   }
    
-  return theme_table($headers, $rows);
+  //return theme_table($headers, $rows);
 }
 
 /*

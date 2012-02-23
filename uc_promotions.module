@@ -65,7 +65,7 @@ function uc_promotions_menu(){
  * Load a promo, called from wildcard menu item
  */
 function uc_promotions_id_load($promo_id){
-  $sql = "SELECT * FROM {uc_promotionstions} WHERE promoid = %d";
+  $sql = "SELECT * FROM {uc_promotions} WHERE promoid = %d";
   $result = db_query($sql, $promo_id);
   
   $results = array();
@@ -87,7 +87,7 @@ function uc_promotions_id_load($promo_id){
 
 function uc_promotions_uc_cart_alter(&$items) {
   //loading active promos
-  $sql = "SELECT * FROM {uc_promotionstions} WHERE status=%d";
+  $sql = "SELECT * FROM {uc_promotions} WHERE status=%d";
   $result = db_query($sql, 1);
   while($data = db_fetch_object($result)){
     //applying the promotion
