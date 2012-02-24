@@ -136,34 +136,36 @@ function uc_promotions_form_submit($form, &$form_state){
  * Returns a list of promotions
  */
 function _get_promos(){
-  $results = db_select('uc_promotions', 'p')
-             ->fields('p', array('promoid', 'nid', 'domain', 'status'))
-             ->execute();
-  var_dump($results);
+  $query = db_select('uc_promotions', 'p');
+  $query->fields('p', array('promoid', 'nid', 'price_limit', 'domain', 'status'));
+  $results = $query->execute();  
   
-  $table = array();
-  $table['headers']= t('Promo-id');
-  $headers[]= t('Product');
-  $headers[]= t('Price limit');
-  $headers[]= t('Domain');
-  $headers[]= t('Status');
-  $headers[]= t('Actions');
+  $header = array(
+    array('data' => t('Promo-id')),
+    array('data' => t('Product')),
+    array('data' => t('Price limit')),
+    array('data' => t('Domain')),
+    array('data' => t('Status')),
+    array('data' => t('Actions')),
+  );
   
   $rows = array();
+
   foreach($results as $data){
-    $content = array();
     $product = node_load($data->nid);
     
-    $content[]= $data->promoid;
-    $content[]= l($product->title, 'node/'.$product->nid);
-    $content[]= '&euro; '.number_format($data->price_limit, 2);
-    $content[]= $data->domain;
-    $content[]= $data->status == '1' ? t('active') : t('not active');
-    $content[]= l(t('edit'), 'admin/store/uc_promotions/'.$data->promoid.'/edit');
-    $rows[]=$content;
+    $rows[] = array(
+      array('data' => $data->promoid),
+      array('data' => l($product->title, 'node/'.$product->nid)),
+      array('data' => '&euro; '.number_format($data->price_limit, 2)),
+      array('data' => $data->domain),
+      array('data' => $data->status == '1' ? t('active') : t('not active')),
+      array('data' => l(t('edit'), 'admin/store/uc_promotions/'.$data->promoid.'/edit')),
+    );
   }
    
-  //return theme_table($headers, $rows);
+  return theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'quotation-table')));
+
 }
 
 /*
