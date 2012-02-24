@@ -18,7 +18,7 @@ function uc_promotions_get_promos(){
  */
 function uc_promotions_create_promo(){
   $output = t("<p>Fill the form to create a new promotion:</p>");
-  $output .= drupal_get_form('uc_promotions_form');
+  $output .= drupal_render(drupal_get_form('uc_promotions_form'));
   return $output;
 }
 
@@ -27,14 +27,18 @@ function uc_promotions_create_promo(){
  */
 function uc_promotions_edit_promo($promo_id = ''){
   $output = t("<p>Fill the form to modify a promotion:</p>");
-  $output .= drupal_get_form('uc_promotions_form', $promo_id);
+  $output .= drupal_render(drupal_get_form('uc_promotions_form', $promo_id));
   return $output;
 }
 
 /*
  * Returns the form to add a promotion
  */
-function uc_promotions_form(&$form_state, $data = NULL){
+function uc_promotions_form($form, &$form_state){
+  $data = $form_state['build_info']['args'][0];
+  var_dump($data);
+
+
   $form['nid'] = array(
     '#title' => t('Product'),
     '#description' => t('Attention: to view a product in this list the product should be unpublished'),
@@ -67,7 +71,7 @@ function uc_promotions_form(&$form_state, $data = NULL){
     '#title' => t('Attivo'),
     '#description' => t('The promotion is active'),
     '#type' => 'select',
-    '#options' => array('' => '', '1' => 'yes', '0' => 'no'),
+    '#options' => array('' => '', '0'=>t('no'), '1'=>t('yes')),
     '#required' => true,
     '#default_value' => $data['status'],
   );
@@ -80,10 +84,10 @@ function uc_promotions_form(&$form_state, $data = NULL){
   
   if($data['promoid']){
     $form['del'] = array(
-      '#title' => t('Deleted'),
+      '#title' => t('Delete'),
       '#description' => t('Delete the promotion'),
       '#type' => 'select',
-      '#options' => array('0'=>'no', '1'=>'si'),
+      '#options' => array('0'=>t('no'), '1'=>t('yes')),
       '#required' => false,
     );
   }
@@ -172,13 +176,16 @@ function _get_promos(){
  * Returns active products
  */
 function _get_products(){
-  $sql = "SELECT * FROM {node} WHERE type = '%s' AND status = %d ORDER BY '%s'";
-  $result = db_query(db_rewrite_sql($sql), "product", 0, 'nid');
-  
-  $results = array("" => "");
-  while($data = db_fetch_object($result)){
-    $results[$data->nid] = '['.$data->nid.'] '.$data->title;
+  $query = db_select('node', 'n')
+            ->fields('n', array('nid', 'title'))
+            ->condition('type', 'product')
+            ->condition('status', 0);
+  $results = $query->execute();
+
+  $rows = array();
+  foreach($results as $data){
+    $rows[$data->nid] = '['.$data->nid.'] '.$data->title;
   }
-  
-  return $results;
+
+  return $rows;
 }

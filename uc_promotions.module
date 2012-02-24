@@ -54,7 +54,7 @@ function uc_promotions_menu(){
     'access arguments' => array('access ubercart promotions'),
     'page callback' => 'uc_promotions_edit_promo',
     'page arguments' => array(3),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
     'file' => 'uc_promotions.inc',
   );
   
@@ -65,19 +65,23 @@ function uc_promotions_menu(){
  * Load a promo, called from wildcard menu item
  */
 function uc_promotions_id_load($promo_id){
-  $sql = "SELECT * FROM {uc_promotions} WHERE promoid = %d";
-  $result = db_query($sql, $promo_id);
+  $query = db_select('uc_promotions', 'p')
+            ->fields('p', array('promoid', 'nid', 'price_limit', 'domain', 'status'))
+            ->condition('promoid', $promo_id);
   
-  $results = array();
-  while($data = db_fetch_object($result)){
-    $results['promoid'] = $data->promoid;
-    $results['nid'] = $data->nid;
-    $results['price_limit'] = $data->price_limit;
-    $results['domain'] = $data->domain;
-    $results['status'] = $data->status;
+  $results = $query->execute();  
+
+  
+  $rows = array();
+  foreach($results as $data){
+    $rows['promoid'] = $data->promoid;
+    $rows['nid'] = $data->nid;
+    $rows['price_limit'] = $data->price_limit;
+    $rows['domain'] = $data->domain;
+    $rows['status'] = $data->status;
   }
 
-  return $results;
+  return $rows;
 }
 
 /**
