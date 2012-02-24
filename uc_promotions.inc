@@ -36,8 +36,6 @@ function uc_promotions_edit_promo($promo_id = ''){
  */
 function uc_promotions_form($form, &$form_state){
   $data = $form_state['build_info']['args'][0];
-  var_dump($data);
-
 
   $form['nid'] = array(
     '#title' => t('Product'),
@@ -117,8 +115,9 @@ function uc_promotions_form_submit($form, &$form_state){
   
   //Delete a promotion
   if($v['del'] == 1){
-    $sql = "DELETE FROM {uc_promotions} WHERE promoid = %d";
-    if(db_query($sql, $v['promoid'])){
+    $query = db_delete('uc_promotions')->condition('promoid', $v['promoid']);
+  
+    if($query->execute()){
       $form_state['redirect'] = 'admin/store/uc_promotions';
       drupal_set_message(t('Promotion deleted'), $type = 'status');
     }
