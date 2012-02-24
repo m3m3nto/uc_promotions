@@ -91,9 +91,12 @@ function uc_promotions_id_load($promo_id){
 
 function uc_promotions_uc_cart_alter(&$items) {
   //loading active promos
-  $sql = "SELECT * FROM {uc_promotions} WHERE status=%d";
-  $result = db_query($sql, 1);
-  while($data = db_fetch_object($result)){
+  $query = db_select('uc_promotions', 'p')
+            ->fields('p', array('promoid', 'nid', 'price_limit', 'domain', 'status'))
+            ->condition('status', 1);
+  $results = $query->execute();
+
+  foreach($results as $data){
     //applying the promotion
     uc_promotions_handler($data->nid, $data->price_limit, $data->domain, $items); 
   }
@@ -101,11 +104,28 @@ function uc_promotions_uc_cart_alter(&$items) {
 }
 
 /**
+ * Implements hook_uc_line_item()
+ */
+function uc_promotions_line_item(){
+  $items[] = array(
+    'id' => 'generic', 
+    'title' => t('Empty line'), 
+    'weight' => 2, 
+    'default' => FALSE, 
+    'stored' => TRUE, 
+    'add_list' => TRUE, 
+    'calculated' => TRUE, 
+  );
+
+  return $items;
+}
+
+/**
  * Promotion handler
  */
 function uc_promotions_handler($nid, $price_limit, $domain, &$items){
-  $domain = isset($domain) ? $domain : $_SERVER['HTTP_HOST'];
-  if($_SERVER['HTTP_HOST'] != $domain){
+  $domain = empty($domain) ? $_SERVER['HTTP_HOST'] : $domain ;
+  if($_SERVER['HTTP_HOST'] != $domain){    
     return;
   }
   
