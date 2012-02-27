@@ -39,7 +39,7 @@ function uc_promotions_form($form, &$form_state){
 
   $form['nid'] = array(
     '#title' => t('Product'),
-    '#description' => t('Attention: to view a product in this list the product should be unpublished'),
+    '#description' => t('Attention: to view a product in this list the product should be published'),
     '#type' => 'select',
     '#options' => _get_products(),
     '#required' => true,
@@ -178,7 +178,7 @@ function _get_products(){
   $query = db_select('node', 'n')
             ->fields('n', array('nid', 'title'))
             ->condition('type', 'product')
-            ->condition('status', 0);
+            ->condition('status', 1);
   $results = $query->execute();
 
   $rows = array();
