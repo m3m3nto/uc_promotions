@@ -46,6 +46,16 @@ function uc_promotions_form($form, &$form_state){
     '#multiple' => false,
     '#default_value' => $data['nid'],
   );
+
+  $form['cid'] = array(
+    '#title' => t('Coupon'),
+    '#description' => t(''),
+    '#type' => 'select',
+    '#options' => _get_coupons(),
+    '#required' => true,
+    '#multiple' => false,
+    '#default_value' => $data['cid'],
+  );
   
   $form['price_limit'] = array(
     '#title' => t('Price limit'),
@@ -140,12 +150,13 @@ function uc_promotions_form_submit($form, &$form_state){
  */
 function _get_promos(){
   $query = db_select('uc_promotions', 'p');
-  $query->fields('p', array('promoid', 'nid', 'price_limit', 'domain', 'status'));
+  $query->fields('p', array('promoid', 'nid', 'cid', 'price_limit', 'domain', 'status'));
   $results = $query->execute();  
   
   $header = array(
     array('data' => t('Promo-id')),
     array('data' => t('Product')),
+    array('data' => t('Coupon')),
     array('data' => t('Price limit')),
     array('data' => t('Domain')),
     array('data' => t('Status')),
@@ -160,6 +171,7 @@ function _get_promos(){
     $rows[] = array(
       array('data' => $data->promoid),
       array('data' => l($product->title, 'node/'.$product->nid)),
+      array('data' => l($data->cid, 'admin/store/coupons/'.$data->cid)),
       array('data' => '&euro; '.number_format($data->price_limit, 2)),
       array('data' => $data->domain),
       array('data' => $data->status == '1' ? t('active') : t('not active')),
@@ -184,6 +196,24 @@ function _get_products(){
   $rows = array();
   foreach($results as $data){
     $rows[$data->nid] = '['.$data->nid.'] '.$data->title;
+  }
+
+  return $rows;
+}
+
+/*
+ * Returns active coupons
+ */
+function _get_coupons(){
+  $query = db_select('uc_coupons', 'c')
+            ->fields('c', array('cid', 'name'))
+            ->condition('type', 'price')
+            ->condition('status', 1);
+  $results = $query->execute();
+
+  $rows = array();
+  foreach($results as $data){
+    $rows[$data->cid] = '['.$data->cid.'] '.$data->name;
   }
 
   return $rows;

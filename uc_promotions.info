@@ -1,9 +1,10 @@
 ; $Id$
 
-name = uc_promotions
+name = Ubercart Promotions
 description = Provides Ubercart promotions functionalities
 package = Ubercart
 core = 7.x
 version = "7.x-1.x-dev"
 
 dependencies[] = uc_cart
+dependencies[] = uc_coupon

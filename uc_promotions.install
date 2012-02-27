@@ -20,6 +20,13 @@ function uc_promotions_schema(){
         'not null' => TRUE,
         'default' => 0,
       ),
+      'cid' => array(
+        'description' => 'The {coupon}.cid of the promo coupon.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
       'price_limit' => array(
         'description' => 'The minimum cart total to fire the promotion.',
         'type' => 'numeric',

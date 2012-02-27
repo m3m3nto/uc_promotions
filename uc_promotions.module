@@ -92,25 +92,20 @@ function uc_promotions_id_load($promo_id){
 function uc_promotions_uc_cart_alter(&$items) {
   //loading active promos
   $query = db_select('uc_promotions', 'p')
-            ->fields('p', array('promoid', 'nid', 'price_limit', 'domain', 'status'))
+            ->fields('p', array('promoid', 'nid', 'cid', 'price_limit', 'domain', 'status'))
             ->condition('status', 1);
   $results = $query->execute();
 
   foreach($results as $data){
     //applying the promotion
-    uc_promotions_handler($data->nid, $data->price_limit, $data->domain, $items);
-    
-    $discount = _uc_promotions_discount($data->nid, $data->price_limit, $items);
-    if($discount){
-      $items[] = $discount;
-    }
+    uc_promotions_handler($data->nid, $data->cid, $data->price_limit, $data->domain, $items);
   }
 }
 
 /**
  * Promotion handler
  */
-function uc_promotions_handler($nid, $price_limit, $domain, &$items){
+function uc_promotions_handler($nid, $cid, $price_limit, $domain, &$items){
   $domain = empty($domain) ? $_SERVER['HTTP_HOST'] : $domain ;
   if($_SERVER['HTTP_HOST'] != $domain){    
     return;
@@ -141,11 +136,13 @@ function uc_promotions_handler($nid, $price_limit, $domain, &$items){
   //Add the promotion
   if($price >= $price_limit && $item_check == 0){
     uc_cart_add_item($promo_free_id, 1);
+    uc_coupon_session_add(_uc_promotions_coupon_code($cid));
   }
   
   //Remove the promotion
   if($price < $price_limit){
     uc_cart_remove_item($promo_free_id, null, $promo_data);
+    uc_coupon_session_clear(_uc_promotions_coupon_code($cid));
   }
 }
 
@@ -161,72 +158,14 @@ function _uc_promotions_price($items){
   return $price;
 }
 
-
-function _uc_promotions_discount($nid, $price_limit, $items){
-  //Discount
-  $discount = new stdClass;
-  $promo_free_id = $nid;
-  $price = _uc_promotions_price($items);
-
-  foreach($items as $item){
-    if($item->nid == $promo_free_id) {
-      //Discount amount = promotional item price
-      $discount->title = t('Promotion: ') . $item->title;
-      $discount->code = 'promo-'.$item->model;
-      $discount->amount = $item->price;
-    }
-  }
-
-  //Add the discount
-  if($price >= $price_limit){
-    return _uc_promotions_discount_cart_item($discount);
-  }
-  
-  //Remove the discount
-  if($price < $price_limit){
-    return false;
-  }
-}
-
 /**
- * Creates a fake cart-item corrresponding to this promotion, 
- * allowing this coupon to be displayed in the cart.
+ * Return current coupon code
  *
  */
-function _uc_promotions_discount_cart_item($discount) {
-  $item = array(
-    'cart_item_id' => 0,
-    'module' => 'uc_promotions',
-    'title' => $discount->title,
-    'nid' => 0,
-    'qty' => 1,
-    'price' => -$discount->amount,
-    'data' => array('module' => 'uc_coupon', 'shippable' => FALSE, 'code' => $discount->code),
-    'model' => 0,
-    'weight' => 0
-  );
-
-  return (object) $item;
+function _uc_promotions_coupon_code($cid){
+  $query = db_select('uc_coupons', 'c')
+            ->fields('c', array('name'))
+            ->condition('cid', $cid);
+  $results = $query->execute()->fetchfield(0);
+  return $results;
 }
-
-
-/**
- * Implements hook_uc_order().
- *
- * This makes sure the active, validated coupons are saved to the order.
- * It also prevents any fake coupon cart-items from being saved to the order.
- */
-function uc_promotions_uc_order($op, &$order) {
-  if ($op == 'presave') {
-    // Make sure any fake cart items don't get saved with the order if the checkout page is skipped
-    // (e.g. Paypal Express Checkout, Google Checkout)
-    foreach ($order->products as $key => $product) {
-      if (isset($product->module) && $product->module == 'uc_promotions') {
-        unset($order->products[$key]);
-      }
-    }
-  }
-}
-
-
-
