@@ -124,11 +124,6 @@ function uc_promotions_handler($nid, $cid, $price_limit, $domain, &$items){
     if($item->nid == $promo_free_id) {
       //Populate $item_check
       $item_check = 1;
-      
-      //Force the promotion qty to 1
-      if($item->qty > 1){
-        $item->qty = 1;
-      }
     }
     
   }
@@ -148,7 +143,6 @@ function uc_promotions_handler($nid, $cid, $price_limit, $domain, &$items){
 
 /**
  * Checks the current cart total and determine the total price
- *
  */
 function _uc_promotions_price($items){
   $price = 0;
@@ -160,11 +154,10 @@ function _uc_promotions_price($items){
 
 /**
  * Return current coupon code
- *
  */
 function _uc_promotions_coupon_code($cid){
   $query = db_select('uc_coupons', 'c')
-            ->fields('c', array('name'))
+            ->fields('c', array('code'))
             ->condition('cid', $cid);
   $results = $query->execute()->fetchfield(0);
   return $results;
